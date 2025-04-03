@@ -21,16 +21,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: mamba-org/setup-micromamba@v1
+      - name: Cache environment
+        id: cache-build-env
+        uses: actions/cache@v4
+        with:
+          path: build_env
+          key: build_env_cache
+      - name: Set up environment
+        if: ${{ steps.cache-build-env.outputs.cache-hit != 'true' }}
+        run: |
+          ./setup_emsdk_env.sh
       - name: Build
         run: |
-          $MAMBA_EXE create -n ems -c conda-forge python=3.12 cmake pyodide-build
+          if [[ $($MAMBA_EXE env list | grep ems) -eq "" ]]; then
+            $MAMBA_EXE create -n ems -c conda-forge python=3.12 cmake pyodide-build boost
+          fi
           eval "$($MAMBA_EXE shell activate ems)"
-          export PYODIDE_EMSCRIPTEN_VERSION=$(pyodide config get emscripten_version)
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          ./emsdk install ${PYODIDE_EMSCRIPTEN_VERSION}
-          ./emsdk activate ${PYODIDE_EMSCRIPTEN_VERSION}
-          source emsdk/emsdk_env.sh
+          source build_env/emsdk/emsdk_env.sh
           pyodide build
       - name: Test
         run: |
