@@ -1,0 +1,35 @@
+[build-system]
+requires = ["scikit-build-core>=0.10"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "boostpython_pyodide"
+version = "0.0.1"
+description = "An example boost::python project building with pyodide for web-browsers"
+readme = "README.md"
+authors = [
+  { name = "Duc Le", email = "duc.le@stfc.ac.uk" },
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Repository = "https://github.com/mducle/boostpyodide"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.scikit-build.cmake.define]
+CMAKE_CXX_FLAGS_RELEASE = "-O2 -DNDEBUG"
+
+[tool.scikit-build]
+cmake.args = ["-G Unix Makefiles"]
+build.tool-args = ["-j8"]
+build.verbose = true
+logging.level = "INFO"
